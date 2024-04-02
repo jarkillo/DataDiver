@@ -19,12 +19,17 @@ async def apply_cleaning_operation(request: CleaningRequest):
 
     try:
         file_location = du.get_file_path(request.file_name)
+
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail="Archivo no encontrado")
     
     try:
+        # Cargar el dataset en asignación asincrona
         df = await ld.load_data(file_location)
+
+        # Aplicar las operaciones de limpieza de datos, enviando el dataset y las opciones y recibiendo el path del archivo limpio y un mensaje
         file_path, message = dcf.data_cleaning(df, options)
+
         logger.info(f"Funcion Datacleaning completa, enviando resultado fuera de la API, Dataset ID: {request.file_name}")
     
     except Exception as e:
